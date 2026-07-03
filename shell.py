@@ -1,4 +1,5 @@
 import sys
+import os
 
 def main():
     
@@ -13,6 +14,7 @@ def main():
         elif parts[0] == "type":
             if parts[1] in ["echo", "exit", "type"]:
                 print(f"{parts[1]} is a shell builtin")
+                continue
             else:
                 print(f"{" ".join(parts[1:])}: not found")
                
