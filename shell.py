@@ -1,10 +1,14 @@
 import sys
 
 def main():
-    sys.stdout.write("$ ")
-    command = input()
-
-    if command == command :
+    
+    while True:
+        sys.stdout.write("$ ")
+        command = input()
+    
+        if command == "exit":
+            break
+        
         print(f"{command}: command not found")
 
 
