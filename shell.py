@@ -11,7 +11,7 @@ def path_command(command_name):
         if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
             return full_path
         
-        if os.path.isfile(full_path + ".exe") and os.access(full_path + ".exe", os.X_OK):
+        if os.path.isfile(full_path + ".exe"):
             return full_path + ".exe"
         
     return None 
@@ -50,8 +50,7 @@ def main():
         else:
             path = path_command(parts[0])
             if path:
-                parts[0]= path
-                subprocess.run(parts)
+                subprocess.run(parts, executable=path)
             else:
                 print(f"{command}: command not found")
 
