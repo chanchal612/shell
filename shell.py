@@ -1,19 +1,20 @@
 import sys
 import os
+import subprocess
 
-def path_command():
+def path_command(command_name):
     paths = os.getenv("PATH", "").split(os.pathsep)
 
     for path in paths:
-        full_path = os.path.join(path, command)
+        full_path = os.path.join(path, command_name)
 
         if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
             return full_path
         
-        if os.path.isfile(full_path + ".exe") and not os.access(full_path + ".exe", os.X_OK):
+        if os.path.isfile(full_path + ".exe") and os.access(full_path + ".exe", os.X_OK):
             return full_path + ".exe"
         
-        return None 
+    return None 
 
 
 
@@ -22,9 +23,11 @@ def main():
     while True:
         sys.stdout.write("$ ")
         command = input()
-
         parts= command.split()
-    
+
+        if not parts:
+            continue
+
         if parts[0] == "exit":
             break
         elif parts[0] == "type":
@@ -34,7 +37,7 @@ def main():
             else:
 
                 path = path_command(parts[1])
-
+                
                 if path:
                     print(f"{parts[1]} is {path}")
                 else:
@@ -45,7 +48,12 @@ def main():
 
 
         else:
-            print(f"{command}: command not found")
+            path = path_command(parts[0])
+            if path:
+                parts[0]= path
+                subprocess.run(parts)
+            else:
+                print(f"{command}: command not found")
 
             
 
