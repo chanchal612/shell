@@ -23,7 +23,24 @@ def main():
     while True:
         sys.stdout.write("$ ")
         command = input()
-        parts= command.split()
+        parts=[]
+        current =""
+        inside_quotes = False
+
+        for char in command:
+            if char == "'":
+                inside_quotes = not inside_quotes
+                continue
+
+            if char == " " and not inside_quotes:
+                if current:
+                    parts.append(current)
+                    current = ""
+
+            else:
+                current += char
+        if current:
+            parts.append(current)
 
         if not parts:
             continue
