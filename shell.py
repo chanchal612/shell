@@ -50,8 +50,17 @@ def main():
             print(os.getcwd())
 
         elif parts[0] == "cd":
+
             if os.path.isdir(parts[1]):
                 os.chdir(parts[1])
+
+            elif parts[1] == "~":
+                home = os.getenv("HOME")
+                if home:
+                    os.chdir(home)
+                else:
+                    print("cd: HOME environment variable is not set")
+
             else:
                 print(f"cd: {parts[1]}: No such file or directory")
 
