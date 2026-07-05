@@ -31,9 +31,11 @@ def main():
         for char in command:
             if char == "'":
                 inside_singles = not inside_singles
+                continue
             if char == '"':
                 inside_doubles = not inside_doubles
-            
+                continue
+
             if char == " " and not inside_singles and not inside_doubles:
                 if current:
                     parts.append(current)
