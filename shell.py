@@ -31,7 +31,7 @@ def main():
         if parts[0] == "exit":
             break
         elif parts[0] == "type":
-            if parts[1] in ["echo", "exit", "type"]:
+            if parts[1] in ["echo", "exit", "type", "pwd"]:
                 print(f"{parts[1]} is a shell builtin")
                 continue
             else:
@@ -45,6 +45,16 @@ def main():
                
         elif parts[0] == "echo":
             print(" ".join(parts[1:]))
+
+        elif parts[0] == "pwd":
+            print(os.getcwd())
+
+        elif parts[0] == "cd":
+            if os.path.isdir(parts[1]):
+                os.chdir(parts[1])
+            else:
+                print(f"cd: {parts[1]}: No such file or directory")
+
 
 
         else:
