@@ -28,28 +28,55 @@ def main():
         inside_singles = False
         inside_doubles = False
 
-        for char in command:
+        i = 0
+        while i < len(command):
+            char = command[i]
             if char == "'":
                 if inside_doubles:
                     current += char
+                    i += 1
                     continue
                 else:
                     inside_singles = not inside_singles
+                    i += 1
                     continue
             if char == '"':
                 if inside_singles:
                     current += char
+                    i += 1
                     continue
                 else:
                     inside_doubles = not inside_doubles
+                    i += 1
                     continue
             if char == " " and not inside_singles and not inside_doubles:
                 if current:
                     parts.append(current)
                     current = ""
+                i += 1
+                continue
+            if char == "\\" and not inside_singles and not inside_doubles:
+                if i + 1 < len(command):
+                    current += command[i + 1]
+                    i += 2
+                    continue
+                else:
+                    current += char
+                    i += 1
+                    continue
+            if char == "\\" and inside_doubles:
+                if i + 1 < len(command):
+                    current += command[i + 1]
+                    i += 2
+                    continue
+                else:
+                    current += char
+                    i += 1
+                    continue
 
             else:
                 current += char
+            i += 1
         if current:
             parts.append(current)
 
