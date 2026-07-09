@@ -14,7 +14,14 @@ def path_command(command_name):
         if os.path.isfile(full_path + ".exe"):
             return full_path + ".exe"
         
-    return None 
+    return None
+
+def write_output(text, redirect_file):
+    if redirect_file:
+        with open(redirect_file, "w") as f:
+            f.write(text + "\n")
+    else:
+        print(text)
 
 
 
@@ -22,6 +29,7 @@ def main():
     
     while True:
         sys.stdout.write("$ ")
+        sys.stdout.flush()
         command = input()
         parts=[]
         current =""
@@ -83,7 +91,20 @@ def main():
         
         if not parts:
             continue
+        
+        i = 0
+        redirect_file =""
 
+        while i < len(parts):
+            if parts[i] == ">" or parts[i] == "1>":
+                if i + 1 < len(parts):
+                    redirect_file = parts[i + 1]
+                    parts = parts[:i]
+                else:
+                    print("Syntax error: expected filename after '>'")
+                    break
+            i += 1
+        
         if parts[0] == "exit":
             break
         elif parts[0] == "type":
@@ -100,7 +121,7 @@ def main():
                     print(f"{" ".join(parts[1:])}: not found")
                
         elif parts[0] == "echo":
-            print(" ".join(parts[1:]))
+            write_output(" ".join(parts[1:]), redirect_file)
 
         elif parts[0] == "pwd":
             print(os.getcwd())
@@ -125,10 +146,15 @@ def main():
         else:
             path = path_command(parts[0])
             if path:
-                subprocess.run(parts, executable=path)
+                if redirect_file:
+                    with open(redirect_file, "w") as f:
+                        subprocess.run(parts,executable=path,stdout=f)
+                else:
+                    subprocess.run(parts,executable=path)
             else:
                 print(f"{command}: command not found")
 
+            
             
 
 
