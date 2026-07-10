@@ -122,8 +122,14 @@ def main():
                     parts = parts[:i]
                     stdout_mode = "a"
                     break
+            elif parts[i] == "2>>":
+                if i + 1 < len(parts):
+                    stderr_redirect_file = parts[i + 1]
+                    parts = parts[:i]
+                    stdout_mode = "a"
+                    break
                 else:
-                    print("Syntax error: expected filename after '>>'")
+                    print("Syntax error: expected filename after '2>>'")
                     break
             i += 1
         
