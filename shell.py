@@ -16,10 +16,10 @@ def path_command(command_name):
         
     return None
 
-def write_output(text, redirect_file):
-    if redirect_file:
-        with open(redirect_file, "w") as f:
-            f.write(text + "\n")
+def write_output(text, stdout_redirect_file, stdout_mode):
+    if stdout_redirect_file:
+        with open(stdout_redirect_file, stdout_mode) as out:
+            out.write(text + "\n")
     else:
         print(text)
 
@@ -93,15 +93,37 @@ def main():
             continue
         
         i = 0
-        redirect_file =""
+        stdout_redirect_file =""
+        stderr_redirect_file =""
+        stdout_mode = None
 
         while i < len(parts):
             if parts[i] == ">" or parts[i] == "1>":
                 if i + 1 < len(parts):
-                    redirect_file = parts[i + 1]
+                    stdout_redirect_file = parts[i + 1]
                     parts = parts[:i]
+                    stdout_mode = "w"
+                    break
                 else:
                     print("Syntax error: expected filename after '>'")
+                    break
+            elif parts[i] == "2>":
+                if i + 1 < len(parts):
+                    stderr_redirect_file = parts[i + 1]
+                    parts = parts[:i]
+                    stdout_mode = "w"
+                    break
+                else:
+                    print("Syntax error: expected filename after '2>'")
+                    break
+            elif parts[i] == ">>" or parts[i] == "1>>":
+                if i + 1 < len(parts):
+                    stdout_redirect_file = parts[i + 1]
+                    parts = parts[:i]
+                    stdout_mode = "a"
+                    break
+                else:
+                    print("Syntax error: expected filename after '>>'")
                     break
             i += 1
         
@@ -121,7 +143,10 @@ def main():
                     print(f"{" ".join(parts[1:])}: not found")
                
         elif parts[0] == "echo":
-            write_output(" ".join(parts[1:]), redirect_file)
+            if stderr_redirect_file:
+                with open(stderr_redirect_file, stdout_mode) as err:
+                    pass
+            write_output(" ".join(parts[1:]), stdout_redirect_file, stdout_mode)
 
         elif parts[0] == "pwd":
             print(os.getcwd())
@@ -146,9 +171,12 @@ def main():
         else:
             path = path_command(parts[0])
             if path:
-                if redirect_file:
-                    with open(redirect_file, "w") as f:
-                        subprocess.run(parts,executable=path,stdout=f)
+                if stdout_redirect_file:
+                    with open(stdout_redirect_file, stdout_mode) as out:
+                        subprocess.run(parts,executable=path,stdout=out)
+                elif stderr_redirect_file:
+                    with open(stderr_redirect_file, stdout_mode) as err:
+                        subprocess.run(parts,executable=path,stderr=err)
                 else:
                     subprocess.run(parts,executable=path)
             else:
