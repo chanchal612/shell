@@ -1,6 +1,8 @@
+from pydoc import text
 import sys
 import os
 import subprocess
+import readline
 
 def path_command(command_name):
     paths = os.getenv("PATH", "").split(os.pathsep)
@@ -23,7 +25,27 @@ def write_output(text, stdout_redirect_file, stdout_mode):
     else:
         print(text)
 
+BUILTINS=["echo","exit"]
 
+def complete(text, state):
+    matches = [cmd for cmd in BUILTINS if cmd.startswith(text)]
+    path = os.getenv("PATH", "").split(os.pathsep)
+    for directory in path:
+        if not os.path.isdir(directory):
+            continue
+        for file in os.listdir(directory):
+            full_path = os.path.join(directory, file)
+
+            if (file.startswith(text) and os.access(full_path, os.X_OK) and os.path.isfile(full_path) and file not in matches):
+                matches.append(file)
+    
+    if state < len(matches):
+        return matches[state]+ " "
+    return None
+
+
+readline.set_completer(complete)
+readline.parse_and_bind("tab: complete")
 
 def main():
     
@@ -153,6 +175,7 @@ def main():
                 with open(stderr_redirect_file, stdout_mode) as err:
                     pass
             write_output(" ".join(parts[1:]), stdout_redirect_file, stdout_mode)
+
 
         elif parts[0] == "pwd":
             print(os.getcwd())
